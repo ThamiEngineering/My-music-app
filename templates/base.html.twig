@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>My Music App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        header {
+            background-color: #1c2322;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        main {
+            margin: 20px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 1.5em;
+            margin-top: 20px;
+            color: black;
+        }
+
+        a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .playlist {
+            margin-bottom: 30px;
+        }
+
+        .playlist-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .album {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .album-title {
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .album-description {
+            font-size: 0.9em;
+            color: #777;
+            margin-bottom: 5px;
+        }
+
+        .album-actions button {
+            font-size: 0.8em;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        footer {
+            background-color: #1c2322;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            margin-top: 20px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .empty {
+            color: #777;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>My Music App</h1>
+    </header>
+    <main>
+        {% if app.user %}
+            <h1>Bienvenue, {{ app.user.firstName }} {{ app.user.lastName }}</h1>
+
+            <form action="{{ path('app_logout') }}" method="post" style="display: inline;">
+                <button type="submit">Déconnexion</button>
+            </form>
+
+            {% if is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('admin_dashboard') }}" class="bg-blue-500 text-white px-4 py-2 rounded ml-2">Admin</a>
+            {% endif %}
+
+            <h2>Créer une nouvelle playlist</h2>
+            <form action="{{ path('create_playlist') }}" method="post">
+                <input type="text" name="nom" placeholder="Nom de la playlist" required>
+                <input type="text" name="description" placeholder="Description de la playlist" required>
+                <button type="submit">Créer</button>
+            </form>
+
+            <h2>Vos Playlists</h2>
+            <div>
+                {% for playlist in app.user.playlists %}
+                    <div class="playlist">
+                        <div class="playlist-title">{{ playlist.nom }} - {{ playlist.description }}</div>
+                        <form action="{{ path('delete_playlist', { 'id': playlist.id }) }}" method="post" style="display: inline;">
+                            <button type="submit">Supprimer</button>
+                        </form>
+                        <ul>
+                            {% for album in playlist.albums %}
+                                <li class="album">
+                                    <div class="album-title">{{ album.titre }}</div>
+                                    <div class="album-description">{{ album.description }}</div>
+                                    <form action="{{ path('remove_from_playlist', { 'playlistId': playlist.id, 'albumId': album.id }) }}" method="post" class="album-actions">
+                                        <button type="submit">Supprimer</button>
+                                    </form>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% else %}
+                    <p class="empty">Vous n'avez aucune playlist.</p>
+                {% endfor %}
+            </div>
+        {% else %}
+            <h1>Bienvenue, invité</h1>
+            <a href="{{ path('app_login') }}">Connexion</a>
+        {% endif %}
+
+        <h2>Artistes</h2>
+        <ul>
+            {% for artiste in artistes %}
+                <li>{{ artiste.nom }} - {{ artiste.biographie }}</li>
+            {% else %}
+                <p class="empty">Aucun artiste disponible.</p>
+            {% endfor %}
+        </ul>
+
+        <h2>Albums</h2>
+        <ul>
+            {% for album in albums %}
+                <li>
+                    {{ album.titre }} - {{ album.description }}
+                    <form action="{{ path('add_to_playlist') }}" method="post">
+                        <input type="hidden" name="albumId" value="{{ album.id }}">
+                        <select name="playlistId" required>
+                            <option value="">Sélectionnez une playlist</option>
+                            {% for playlist in app.user.playlists %}
+                                <option value="{{ playlist.id }}">{{ playlist.nom }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit">Ajouter à ma playlist</button>
+                    </form>
+                </li>
+            {% else %}
+                <p class="empty">Aucun album disponible.</p>
+            {% endfor %}
+        </ul>
+    </main>
+    <footer>
+        <p>&copy; 2024 My Music App</p>
+    </footer>
+</body>
+</html>

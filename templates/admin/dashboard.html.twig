@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Admin Dashboard{% endblock %}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #1c2322;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        main {
+            margin: 20px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: black;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        button {
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .button-red {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .button-red:hover {
+            background-color: #d32f2f;
+        }
+
+        .button-green {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .button-green:hover {
+            background-color: #45a049;
+        }
+
+        .button-blue {
+            background-color: #2196F3;
+            color: white;
+        }
+
+        .button-blue:hover {
+            background-color: #1976D2;
+        }
+
+        .empty {
+            color: #777;
+            font-style: italic;
+            text-align: center;
+        }
+
+        .back-button {
+            background-color: #1c2322;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+        }
+
+        .back-button:hover {
+            background-color: black;
+        }
+
+        input[type="text"], textarea {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+
+        textarea {
+            height: 100px;
+        }
+    </style>
+    {% block stylesheets %}{% endblock %}
+</head>
+<body>
+    <header>
+        <h1>Admin Dashboard</h1>
+    </header>
+    <main>
+        {% block body %}
+            <a href="{{ path('homepage') }}" class="back-button">Revenir à l'accueil</a>
+            <h2>Liste des utilisateurs</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Email</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                        <tr>
+                            <td>{{ user.firstName }} {{ user.lastName }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                <form action="{{ path('admin_ban_user', { 'id': user.id }) }}" method="post" style="display: inline;">
+                                    <button type="submit" class="button-red">Bannir</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="3" class="empty">Aucun utilisateur trouvé.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <h2>Utilisateurs bannis</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Email</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in bannedUsers %}
+                        <tr>
+                            <td>{{ user.firstName }} {{ user.lastName }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                <form action="{{ path('admin_unban_user', { 'id': user.id }) }}" method="post" style="display: inline;">
+                                    <button type="submit" class="button-green">Débannir</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="3" class="empty">Aucun utilisateur banni trouvé.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <h2>Créer un nouvel artiste</h2>
+            <form action="{{ path('admin_create_artist') }}" method="post">
+                <input type="text" name="nom" placeholder="Nom de l'artiste" required>
+                <textarea name="biographie" placeholder="Biographie de l'artiste" required></textarea>
+                <input type="text" name="image" placeholder="URL de l'image" required>
+                <button type="submit" class="button-blue">Créer</button>
+            </form>
+
+            <h2>Liste des artistes</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Biographie</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for artiste in artistes %}
+                        <tr>
+                            <td>{{ artiste.nom }}</td>
+                            <td>{{ artiste.biographie }}</td>
+                            <td>
+                                <form action="{{ path('admin_delete_artist', { 'id': artiste.id }) }}" method="post" style="display: inline;">
+                                    <button type="submit" class="button-red">Supprimer</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <h3>Albums de {{ artiste.nom }}</h3>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Titre</th>
+                                            <th>Description</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for album in artiste.albums %}
+                                            <tr>
+                                                <td>{{ album.titre }}</td>
+                                                <td>{{ album.description }}</td>
+                                                <td>
+                                                    <form action="{{ path('admin_delete_album', { 'id': album.id }) }}" method="post" style="display: inline;">
+                                                        <button type="submit" class="button-red">Supprimer</button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="3" class="empty">Aucun album trouvé.</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                <h3>Ajouter un album à {{ artiste.nom }}</h3>
+                                <form action="{{ path('admin_add_album', { 'artisteId': artiste.id }) }}" method="post">
+                                    <input type="text" name="titre" placeholder="Titre de l'album" required>
+                                    <textarea name="description" placeholder="Description de l'album" required></textarea>
+                                    <input type="text" name="cover" placeholder="URL de la couverture" required>
+                                    <button type="submit" class="button-green">Ajouter</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="3" class="empty">Aucun artiste trouvé.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endblock %}
+    </main>
+</body>
+</html>

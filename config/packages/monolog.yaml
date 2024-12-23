@@ -1,0 +1,14 @@
+monolog:
+    handlers:
+        main:
+            type: stream
+            path: "%kernel.logs_dir%/%kernel.environment%.log"
+            level: debug
+        console:
+            type: console
+            process_psr_3_messages: false
+            channels: ["!event", "!doctrine"]
+        custom_debug:
+            type: stream
+            path: "%kernel.logs_dir%/debug.log"
+            level: debug

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Connexion / Inscription</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-around;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 700px;
+        }
+
+        .form-container {
+            width: 45%;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="email"],
+        input[type="password"],
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .checkbox {
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .error {
+            color: #f44336;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <h1>Connexion</h1>
+            <form action="{{ path('app_login') }}" method="post">
+                {% if error %}
+                    <div class="error">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                {% endif %}
+                <label for="inputEmail">Email</label>
+                <input type="email" value="{{ last_username }}" name="email" id="inputEmail" autocomplete="email" required autofocus>
+                <label for="inputPassword">Mot de passe</label>
+                <input type="password" name="password" id="inputPassword" autocomplete="current-password" required>
+
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="_remember_me"> Se souvenir de moi
+                    </label>
+                </div>
+
+                <button type="submit">Se connecter</button>
+            </form>
+        </div>
+        <div class="form-container">
+            <h1>Inscription</h1>
+            <form action="{{ path('app_register') }}" method="post">
+                <label for="registerEmail">Email</label>
+                <input type="email" name="email" id="registerEmail" required>
+                <label for="registerFirstName">Prénom</label>
+                <input type="text" name="firstName" id="registerFirstName" required>
+                <label for="registerLastName">Nom</label>
+                <input type="text" name="lastName" id="registerLastName" required>
+                <label for="registerPassword">Mot de passe</label>
+                <input type="password" name="password" id="registerPassword" required>
+                <label for="registerConfirmPassword">Confirmer le mot de passe</label>
+                <input type="password" name="confirmPassword" id="registerConfirmPassword" required>
+
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('register') }}">
+
+                <button type="submit">S'inscrire</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
